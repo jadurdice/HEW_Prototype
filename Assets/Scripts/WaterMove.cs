@@ -12,6 +12,8 @@ public class WaterMove : MonoBehaviour
     public float drag = 0.1f;
     public int fadeFrame;
 
+    public int GateSpeed;
+
     public float boostMulti = 2.0f;
     public int boostFrame;
 
@@ -97,4 +99,15 @@ public class WaterMove : MonoBehaviour
     {
         boostFrame = boost;
     }
+
+    private void OnTriggerEnter(Collider other)
+    {
+        if (other.gameObject.CompareTag("Player"))
+        {
+            rb.AddForceAtPosition(-1.0f * transform.right * GateSpeed / 100.0f * airDrag, motor[0].position);
+            rb.AddForceAtPosition(transform.right * GateSpeed / 100.0f * airDrag, motor[1].position);
+            frameCnt = -1 * fadeFrame;
+        }
+    }
+
 }
