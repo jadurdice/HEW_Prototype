@@ -8,10 +8,10 @@ public class Wave : MonoBehaviour
     public int Demensions = 10;
     public Octave[] octaves;
     public float uvScale;
+    public float rotAngle = 0.0f;
 
     protected MeshFilter meshFilter;
     protected Mesh mesh;
-
 
     [Serializable]
     public struct Octave
@@ -55,13 +55,21 @@ public class Wave : MonoBehaviour
     private Vector3[] GenerateVertex()
     {
         var verts = new Vector3[(Demensions + 1) * (Demensions + 1)];
+        float degToRadius = Mathf.Deg2Rad * rotAngle;
         for (int x = 0; x <= Demensions; x++)
         {
             for (int z = 0; z <= Demensions; z++)
             {
-                verts[MakeIndex(x, z)] = new Vector3(x, 0, z);
+                float rx;
+
+                rx = Mathf.Cos(degToRadius) * x - Mathf.Sin(degToRadius) * 1.0f;
+
+                verts[MakeIndex(x, z)] = new Vector3(rx, 0, z);
             }
         }
+
+     
+
         return verts;
     }
 
@@ -100,7 +108,9 @@ public class Wave : MonoBehaviour
         {
             for (int z = 0; z <= Demensions; z++)
             {
-                var y = 0.0f;
+                float y;
+                float degToRadius = Mathf.Deg2Rad * rotAngle;
+                y = Mathf.Sin(degToRadius) * x + Mathf.Cos(degToRadius) * 1.0f;
 
                 for (int o = 0; o < octaves.Length; o++)
                 {

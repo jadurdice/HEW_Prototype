@@ -12,15 +12,21 @@ public class WaterMove : MonoBehaviour
     public float drag = 0.1f;
     public int fadeFrame;
 
+    public float boostMulti = 2.0f;
+    public int boostFrame;
+
     protected Rigidbody rb;
+    protected float airDrag;
     protected Quaternion startRotation;
     protected int frameCnt;
+    protected FloatingObject floatObj;
 
     // Start is called before the first frame update
     void Awake()
     {
         rb = GetComponent<Rigidbody>();
         startRotation = motor[0].localRotation;
+        floatObj = gameObject.GetComponent<FloatingObject>();
     }
 
     // Update is called once per frame
@@ -29,35 +35,66 @@ public class WaterMove : MonoBehaviour
         var forceDirection = transform.forward;
         var forward = Vector3.Scale(new Vector3(1, 0, 1), transform.forward);
 
-
+        if (floatObj.pointUnderWater)
+        {
+            airDrag = 1.0f;
+        }
+        else
+        {
+            airDrag = 0.1f;
+        }
         if (Input.GetKeyDown(KeyCode.A))
         {
-            rb.AddForceAtPosition(transform.right * steerPower / 100.0f, motor[0].position);
+            rb.AddForceAtPosition(-1.0f * transform.right * steerPower / 100.0f * airDrag, motor[0].position);
             frameCnt = fadeFrame;
         }
         if (Input.GetKeyDown(KeyCode.D))
         {
-            rb.AddForceAtPosition(-1.0f * transform.right * steerPower / 100.0f, motor[1].position);
+            rb.AddForceAtPosition(transform.right * steerPower / 100.0f * airDrag, motor[1].position);
             frameCnt = fadeFrame;
         }
         if (Input.GetKeyDown(KeyCode.Q))
         {
-            rb.AddForceAtPosition(transform.right * steerPower / 100.0f, motor[2].position);
+            rb.AddForceAtPosition(transform.right * steerPower / 100.0f * airDrag, motor[2].position);
             frameCnt = -1 * fadeFrame;
         }
         if (Input.GetKeyDown(KeyCode.E))
         {
-            rb.AddForceAtPosition(-1.0f * transform.right * steerPower / 100.0f, motor[3].position);
+            rb.AddForceAtPosition(-1.0f * transform.right * steerPower / 100.0f * airDrag, motor[3].position);
             frameCnt = -1 * fadeFrame;
         }
 
 
+
+
         if (frameCnt != 0)
         {
-            PhysicsHelper.ApplyForceToReachVelocity(rb, frameCnt * forward * maxSpeed * transform.localScale.y, power);
-            frameCnt = frameCnt > 0 ? frameCnt - 1 : frameCnt + 1;
+            if(boostFrame != 0)
+            {
+                PhysicsHelper.ApplyForceToReachVelocity(rb, frameCnt * forward * maxSpeed * transform.localScale.y, power * boostMulti);
+                boostFrame -= 1;
+                Debug.Log(boostFrame);
+            }
+            else
+            {
+                PhysicsHelper.ApplyForceToReachVelocity(rb, frameCnt * forward * maxSpeed * transform.localScale.y, power);
+            }
+
+            if (floatObj.pointUnderWater)
+            {
+                frameCnt = frameCnt > 0 ? frameCnt - 1 : frameCnt + 1;
+            }
+            else
+            {
+                frameCnt = 0;
+            }
+
 
         }
 
+    }
+    public void SetBoost(int boost)
+    {
+        boostFrame = boost;
     }
 }

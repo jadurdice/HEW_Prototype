@@ -21,6 +21,9 @@ public class FloatingObject : MonoBehaviour
     public Vector3 smoothVectorRotation;
     public Vector3 targetUp;
 
+    public bool pointUnderWater = false;
+
+
     public Vector3 center { get { return transform.position + centerOffset; } }
 
     private void Awake()
@@ -48,7 +51,7 @@ public class FloatingObject : MonoBehaviour
     void Update()
     {
         var newWaterLine = 0f;
-        var pointUnderWater = false;
+        pointUnderWater = false;
 
         for (int i = 0; i < floatPoint.Length; i++)
         {
